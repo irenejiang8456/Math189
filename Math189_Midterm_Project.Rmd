@@ -1,0 +1,140 @@
+---
+title: "MT_project"
+author: "Irene Jiang"
+date: "2021/1/24"
+output:
+  pdf_document: default
+  html_document: default
+---
+# Introduction
+In this project, I'm going to explore the relationship between the car's weight(wt) and miles per gallon(mpg) by employing a scatterplot and check the biasness of my sample statistics. Furthermore, I will emplore whether the relationship between these two variables change based on the the number of cylinders(cyl) by generating scatterplots and examinng the statistics of each variable grouped by the number of cylinders.
+
+# Body
+
+## Data
+```{r}
+pathfile=getwd()
+pathfile=file.path(pathfile,"\\mtcars.csv")
+car=read.table(pathfile,sep=",", header=TRUE)
+car
+```
+Source: Henderson and Velleman (1981), Building multiple regression models interactively. *Biometrics*, 37, 391–411.
+
+The data is from the 1974 Motor Trend US magazine, and consists fuel consumption and 10 aspects of automobile design and performance for 32 automobiles (1973-74 models). The dataset contains 32 observations on 11 variables. 
+
+```{r}
+dim(car)[1]
+```
+
+## Method
+
+In order to analyze the relationship between weight and miles per gallon, I will employ a scatterplot and use correlation between two variable as my estimator. I will also check for the biasness of my estimator by computing sample mean,variance, and generating boxplots, which shows the shape, spread, and center of the weight and miles per gallon distributions. Then I will explore if relationship between weight and miles per gallon depends on the number of cylinders by looking at scatterplots by controlling the number of cylinders. At last, I will see if the correlation between these two variables change as number of cylinders change.
+
+### A scatterplot showing the relationship between weight and miles per gallon:
+
+```{r}
+plot(x=car$wt,y=car$mpg,xlab="Weight",ylab="Miles per gallon",
+     main ="Miles per gallon vs Weight")
+```
+
+
+```{r}
+cov(car$wt,car$mpg)
+```
+To standardize the covariance into the interval of -1 to 1, I calculated the correlation between weight and miles per gallon:
+```{r}
+cor(car$wt,car$mpg)
+```
+
+One could see from the graph that on average, when weight increases, miles per gallon decreases. By looking at the correlation, they are indeed strongly negatively correlated(-0.87, which is close to -1). Now, I could examine the bias of the dataset.
+
+```{r}
+boxplot(car$wt,ylab="Weight",
+     main ="Boxplot for weight ")
+```
+
+```{r}
+boxplot(car$mpg,ylab="Miles per gallon",
+     main ="Boxplot for miles per gallon ")
+```
+
+```{r}
+mean(car$wt)
+mean(car$mpg)
+var(car$wt)
+var(car$mpg)
+```
+
+## Analysis
+
+We could see from the scatterplot and correlation between weight and miles per gallon that they are strongly negatively correlated (correlation is -0.87, which is close to -1). This makes sense since it's reasonable that number of cylinders increases the weight of the car and burn more gas per mile, so decrease miles per gallon a car could drive. 
+In terms of biasness: I plotted  boxplots for weight and miles per gallon. one could see the distribution of weight is slightly skewed to the right with 2 outliers. And the mean(3.22) is greater than its variance(0.96). So the sample of car's weight is slightly biased with two outliers. By looking at the boxplot of miles per gallon, one could see the distribution of it is also slightly skewed to the right with no outliers. However, the sample mean(20.09) is smaller than its variance(36.32). So the sample of car's miles per gallon is slightly baised with large variance. 
+But according to the central limit theorem, as long as the data collected identically independently distributed with large sample size, we can analyze the data assuming they are normally distributed. So in this case, we have data size bigger than 30, and as long as we made sure the data is randomly created, we could treat the dataset approximately normal(sample mean and variance converges to population mean and variance). And estimators in normal sample distribution are unbiased from the population distribution. So the correlation is unbiased calculated from this entire dataset.
+
+### A scatterplot showing the relationship between weight and miles per gallon depending on number of cylinders:
+```{r}
+plot(x=car$wt,y=car$mpg,ylab="Miles per gallon",xlab="Weight",
+     main ="Miles per gallon vs Weight",
+     col=ifelse(car$cyl==4,"Red",ifelse(car$cyl==6,"Green","Black")))
+```
+By indicating the relationship between weight and miles per gallon with different color according to the number of cylinders, one could still see there are negative relationship between weight and miles per gallon for each of number of cylinders. Therefore, I want to further investigate whether the relationship between weight and miles per gallon depends on the number of cylinders. In order to accomplish that, I will look for the change in sample correlation of the two variables when number of cylinders changes.
+
+### Sample mean/variance/correlation of weight and mile per gallon when number of cylinders is 4:
+```{r}
+Sample1=subset(car,car$cyl==4)
+plot(x=Sample1$wt,y=Sample1$mpg,xlab="Weight",ylab="Miles per gallon",
+     main ="Mpg vs Wt when cyl=4")
+```
+```{r}
+mean(Sample1$wt)
+mean(Sample1$mpg)
+var(Sample1$wt)
+var(Sample1$mpg)
+cor(Sample1$wt,Sample1$mpg)
+```
+
+### Sample mean/variance/correlation of weight and mile per gallon when number of cylinders is 6:
+```{r}
+Sample2=subset(car,car$cyl==6)
+plot(x=Sample2$wt,y=Sample2$mpg,xlab="Weight",ylab="Miles per gallon",
+     main ="Mpg vs Wt when cyl=6")
+```
+```{r}
+mean(Sample2$wt)
+mean(Sample2$mpg)
+var(Sample2$wt)
+var(Sample2$mpg)
+cor(Sample2$wt,Sample2$mpg)
+```
+
+
+### Sample mean/variance/correlation of weight and mile per gallon when number of cylinders is 8:
+```{r}
+Sample3=subset(car,car$cyl==8)
+plot(x=Sample3$wt,y=Sample3$mpg,xlab="Weight",ylab="Miles per gallon",
+     main ="Mpg vs Wt when cyl=8")
+```
+
+```{r}
+mean(Sample3$wt)
+mean(Sample3$mpg)
+var(Sample3$wt)
+var(Sample3$mpg)
+cor(Sample3$wt,Sample3$mpg)
+```
+
+```{r}
+dim(Sample1)[1]
+dim(Sample2)[1]
+dim(Sample3)[1]
+```
+
+
+## Result
+
+After finding a strong negative relationship between weight and miles per gallon based on entire dataset, I splited the dataset into subsets in order to control the number of cylinders. As the scatterplots(after controlling the number of cylinders) show: for each subset controlling the number of cylinders, there is a moderately strong negative correlation between weight and miles per gallon. The correlation between weight and miles per gallon is -0.71,-0.68,and -0.65 corresponded to the number of cylinders equal to 4,6,and 8. They are all indicated a moderately negatively correlation between weight and miles per gallon for all values of number of cylinders despite a little variation. So I can conclude number of cylinders have no effect on the relationship between car's weight and miles per gallon.
+In terms of biasness, for all subsets of the original data, now means of both variable is greater than the variance, which indicates a less spreadout distributions. However, with the data size of 11,7,14 within each subset, we might want to increase the sample size(to at least sample size of 30) within each subset of data to apply the central limit theorem to assume the distribution of samples to be normal and unbaised. Thus, I can't be entirely sure if number of cylinder has no effect on the negative correlation between the weight and miles per gallon. After increasing the sample size within each subset to be larger than 30, we could further investigation if the moderate strong relationship between weight and miles per gallon is unbiased and consistent no matter the change in number of cylinders.
+ 
+# Conclusion 
+
+In this project, I have found out the relationship between weight and miles per gallon is strongly negatively correlated by looking at their correlation. According to the central limit theorem, my statistics are unbiased. Therefore, based on my plot and statistics, I can conclude that weight and miles per gallon is strongly negatively correlated that when car's weight increases, miles per gallon decrease. Furthermore, I have found out the relationship between weight and miles per gallon is not affected by the number of cylinders by analyzing the change in correlation and sample mean in the subset of the data that is grouped by the number of cylinders. I could see there is a little change in the correlation between the weight and miles per gallon in the subset data. However, the subset of the data is somewhat biased because the small sample size in each group; therefore, increasing the sample size could strengthen the conclusion on whether the correlation between weight and miles per gallon really changed due to the number of cylinder in each subset. In addition, we need to be careful with the the way the organization collected dataset. Car companies may manipulated the data or did not randomly collected data, which would result bias into the data.
